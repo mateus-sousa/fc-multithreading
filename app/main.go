@@ -7,17 +7,29 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 func main() {
+	postalCode := os.Args[1]
 	c1 := make(chan []byte)
 	c2 := make(chan []byte)
-	go getAddressByViaCep("73402574", c1)
-	go getAddressByBrasilAPI("73402574", c2)
+	go getAddressByViaCep(postalCode, c1)
+	go getAddressByBrasilAPI(postalCode, c2)
+
+	select {
+	case address := <-c1:
+		fmt.Println(string(address))
+	case address := <-c2:
+		fmt.Println(string(address))
+	case <-time.After(time.Second * 1):
+		log.Fatal("request to get address by postalcode timeout")
+	}
 }
 
-func getAddressByViaCep(cepNumber string, c1 chan []byte) {
-	req, err := http.NewRequestWithContext(context.Background(), "GET", fmt.Sprintf("http://viacep.com.br/ws/%s/json/", cepNumber), nil)
+func getAddressByViaCep(postalCode string, c1 chan []byte) {
+	req, err := http.NewRequestWithContext(context.Background(), "GET", fmt.Sprintf("http://viacep.com.br/ws/%s/json/", postalCode), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
