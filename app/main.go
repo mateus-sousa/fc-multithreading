@@ -13,15 +13,17 @@ import (
 
 func main() {
 	postalCode := os.Args[1]
-	c1 := make(chan []byte)
-	c2 := make(chan []byte)
-	go getAddressByViaCep(postalCode, c1)
-	go getAddressByBrasilAPI(postalCode, c2)
+	viaCepCh := make(chan []byte)
+	brasilAPICh := make(chan []byte)
+	go getAddressByViaCep(postalCode, viaCepCh)
+	go getAddressByBrasilAPI(postalCode, brasilAPICh)
 
 	select {
-	case address := <-c1:
+	case address := <-viaCepCh:
+		fmt.Println("Endereço recebido pela API:", "http://viacep.com.br")
 		fmt.Println(string(address))
-	case address := <-c2:
+	case address := <-brasilAPICh:
+		fmt.Println("Endereço recebido pela API:", "https://brasilapi.com.br")
 		fmt.Println(string(address))
 	case <-time.After(time.Second * 1):
 		log.Fatal("request to get address by postalcode timeout")
