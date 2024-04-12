@@ -15,7 +15,7 @@ func main() {
 	postalCode := os.Args[1]
 	viaCepCh := make(chan []byte)
 	brasilAPICh := make(chan []byte)
-	//go getAddressByViaCep(postalCode, viaCepCh)
+	go getAddressByViaCep(postalCode, viaCepCh)
 	go getAddressByBrasilAPI(postalCode, brasilAPICh)
 
 	select {
