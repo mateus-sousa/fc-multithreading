@@ -15,7 +15,7 @@ func main() {
 	postalCode := os.Args[1]
 	viaCepCh := make(chan []byte)
 	brasilAPICh := make(chan []byte)
-	go getAddressByViaCep(postalCode, viaCepCh)
+	//go getAddressByViaCep(postalCode, viaCepCh)
 	go getAddressByBrasilAPI(postalCode, brasilAPICh)
 
 	select {
@@ -50,7 +50,7 @@ func getAddressByViaCep(postalCode string, c1 chan []byte) {
 }
 
 func getAddressByBrasilAPI(cepNumber string, c2 chan []byte) {
-	req, err := http.NewRequestWithContext(context.Background(), "GET", fmt.Sprintf("https://brasilapi.com.br/api/cep/v2/%s", cepNumber), nil)
+	req, err := http.NewRequestWithContext(context.Background(), "GET", fmt.Sprintf("https://brasilapi.com.br/api/cep/v1/%s", cepNumber), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
